@@ -2,7 +2,7 @@ package actor;
 
 public abstract class Actor {
     Stats stats;
-    protected String name;
+    public String name;
     protected String id;
 
     @Override

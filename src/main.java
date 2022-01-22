@@ -1,23 +1,25 @@
 import actor.player.Player;
+import enums.PlayerStates;
 import game.Game;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 public class main {
     Player[] players;
 
-    static ArrayList<String> FirstNames = new ArrayList<String>();
-    static ArrayList<String> LastNames = new ArrayList<String>();
+    static ArrayList<String> FirstNames = new ArrayList<>();
+    static ArrayList<String> LastNames = new ArrayList<>();
 
     public static void main(String args[]) {
 
         loadFirstNames();
         loadLastNames();
 
-        System.out.println("FirstNames length: %s\r\nLastNames length: %s".formatted(FirstNames.size(), LastNames.size()));
+//        System.out.printf("FirstNames length: %s\r\nLastNames length: %s%n", FirstNames.size(), LastNames.size());
 
         new main(args);
     }
@@ -26,9 +28,9 @@ public class main {
         try {
             BufferedReader namesFile = new BufferedReader(new FileReader("data/first_names.txt"));
             String line;
-            while((line = namesFile.readLine()) != null) FirstNames.add(line);
-        } catch(Exception e) {
-            System.out.println(e);
+            while ((line = namesFile.readLine()) != null) FirstNames.add(line);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -36,26 +38,45 @@ public class main {
         try {
             BufferedReader namesFile = new BufferedReader(new FileReader("data/last_names.txt"));
             String line;
-            while((line = namesFile.readLine()) != null) LastNames.add(line);
-        } catch(Exception e) {
-            System.out.println(e);
+            while ((line = namesFile.readLine()) != null) LastNames.add(line);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
     public main(String[] args) {
-        int count = 10_000;
+        int count = 5_000;
         players = GeneratePlayers(count);
 
         Game[] games = new Game[count / 10];
-        for (int i = 0; i < (count / 10); i++) {
-            games[i] = Game.MakeGame(Arrays.copyOfRange(players, i, i + 10));
+        for (int i = 0; i < (count/10); i += 1) {
+            Player[] playersForGame =Arrays.copyOfRange(players, i*10, (i*10) + 10);
+
+            // assign players
+            for(Player p : playersForGame) {
+                p.status = PlayerStates.IN_GAME;
+            }
+
+            games[i] = Game.MakeGame(playersForGame);
         }
+
+        Player[][] winners = new Player[count/10][];
+        int i = 0;
+        for (Game g : games) {
+            winners[i++] = g.play();
+        }
+
+        for (Player[] w : winners) System.out.println(Arrays.toString(w));
+
     }
 
+    private static String GetRandomName() {
+        return String.join("_", FirstNames.get((new Random()).nextInt(0, FirstNames.size())), LastNames.get((new Random()).nextInt(0, LastNames.size())));
+    }
 
     private static Player[] GeneratePlayers(int count) {
         Player[] output = new Player[count];
-        for (int i = 0; i < count; i++) output[i] = new Player("");
+        for (int i = 0; i < count; i++) output[i] = new Player(GetRandomName());
         return output;
     }
 }

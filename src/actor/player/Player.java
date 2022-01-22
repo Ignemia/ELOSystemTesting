@@ -1,13 +1,15 @@
 package actor.player;
 
 import actor.Actor;
+import enums.PlayerStates;
 
 import java.util.Random;
 import java.util.UUID;
 
 public class Player extends Actor {
     PlayerStats stats = new PlayerStats();
-    Float skill = 1000F;
+    public Float skill = 1000F;
+    public PlayerStates status = PlayerStates.IN_GAME_SEARCH;
 
 
     public Player(String in_name) {
