@@ -4,7 +4,6 @@ import game.Game;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.sql.Time;
 import java.util.*;
 
 public class main {
@@ -17,8 +16,6 @@ public class main {
 
         loadFirstNames();
         loadLastNames();
-
-//        System.out.printf("FirstNames length: %s\r\nLastNames length: %s%n", FirstNames.size(), LastNames.size());
 
         new main(args);
     }
@@ -63,10 +60,7 @@ public class main {
         for (Game g : games) {
             g.play();
             g.getWinner();
-//            System.out.println(g.generateRoundsReport()+"====".repeat(5));
         }
-
-//        for (Player[] w : winners) System.out.println(Arrays.toString(w));
 
 
         long endTime = (new Date()).getTime();
