@@ -24,19 +24,23 @@ public class Player extends Actor {
         return 1F;
     }
 
+    private void setStatus(PlayerStates state) {
+        if (status != state) status = state;
+    }
+
     public float getDamageMultiplier() {
         double hitValue = (new Random()).nextDouble();
 
         double headshotLow = Math.cos(((Math.PI * skill) / (SkillMax * 2)) * 0.7 + 0.3);
         double bodyshotLow = Math.cos(((Math.PI * skill) / (SkillMax * 2)) * 0.4 + 0.05);
-        if (hitValue > headshotLow) return 2F;
-        if (hitValue > bodyshotLow) return 1F;
-        return 0.5F;
+        if (hitValue > headshotLow) return 1F;
+        if (hitValue > bodyshotLow) return 0.7F;
+        return 0.3F;
     }
 
     public long damage(final float amount) {
         long takenDamage = stats.takeDamage(stats.mitigateDamage(amount));
-        if (stats.currentHp <= 0) status = PlayerStates.DEAD;
+        if (stats.currentHp <= 1F) setStatus(PlayerStates.DEAD);
         return takenDamage;
     }
 
@@ -46,5 +50,14 @@ public class Player extends Actor {
 
     public String getId() {
         return this.id;
+    }
+
+    public String getStatusString() {
+        return name + " (" + getStats().getCurrentHp() + "HP - " + (status == PlayerStates.DEAD ? "DEAD" : "ALIVE") + ")";
+    }
+
+    public void reset() {
+        setStatus(PlayerStates.SEEKING_COMBAT);
+        stats.currentHp = stats.hpTotal;
     }
 }

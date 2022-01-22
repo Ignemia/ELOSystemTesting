@@ -45,7 +45,7 @@ public class main {
 
     public main(String[] args) {
         long startTime = (new Date()).getTime();
-        int count = 100_000;
+        int count = 200_000;
         players = GeneratePlayers(count);
 
         Game[] games = new Game[count / 10];
@@ -60,10 +60,10 @@ public class main {
             games[i] = Game.MakeGame(playersForGame);
         }
 
-        Player[][] winners = new Player[count/10][];
-        int i = 0;
         for (Game g : games) {
-            winners[i++] = g.play();
+            g.play();
+            g.getWinner();
+//            System.out.println(g.generateRoundsReport()+"====".repeat(5));
         }
 
 //        for (Player[] w : winners) System.out.println(Arrays.toString(w));

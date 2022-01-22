@@ -6,9 +6,8 @@ public class PlayerStats implements Stats {
     public long attackDamage = 100L;
     public Double attackPrecision = 0.05;
     public long armor = 0L;
-    public Float hpTotal = 0F;
-    public Float currentHp = 0F;
-    public boolean isDead = false;
+    public Float hpTotal = 100F;
+    public Float currentHp = 100F;
 
     public PlayerStatValues getStats() {
         return new PlayerStatValues(attackDamage, attackPrecision, armor, hpTotal, currentHp);
@@ -17,7 +16,6 @@ public class PlayerStats implements Stats {
 
     public long takeDamage(float amount) {
         currentHp -= amount;
-        if(currentHp <= 0) isDead = true;
         return ((long) amount);
     }
 
