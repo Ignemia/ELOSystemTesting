@@ -3,7 +3,7 @@ package actor.player;
 import actor.Stats;
 
 public class PlayerStats implements Stats {
-    public long attackDamage = 0L;
+    public long attackDamage = 100L;
     public Double attackPrecision = 0.05;
     public long armor = 0L;
     public Float hpTotal = 0F;

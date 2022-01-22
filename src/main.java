@@ -4,9 +4,8 @@ import game.Game;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
+import java.sql.Time;
+import java.util.*;
 
 public class main {
     Player[] players;
@@ -45,7 +44,8 @@ public class main {
     }
 
     public main(String[] args) {
-        int count = 5_000;
+        long startTime = (new Date()).getTime();
+        int count = 100_000;
         players = GeneratePlayers(count);
 
         Game[] games = new Game[count / 10];
@@ -66,7 +66,12 @@ public class main {
             winners[i++] = g.play();
         }
 
-        for (Player[] w : winners) System.out.println(Arrays.toString(w));
+//        for (Player[] w : winners) System.out.println(Arrays.toString(w));
+
+
+        long endTime = (new Date()).getTime();
+
+        System.out.printf("Execution took: %s", (((float)(endTime - startTime))/1000f)+"s");
 
     }
 
