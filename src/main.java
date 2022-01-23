@@ -42,7 +42,7 @@ public class main {
 
     public main(String[] args) {
         long startTime = (new Date()).getTime();
-        int count = 200_000;
+        int count = 10_000;
         players = GeneratePlayers(count);
 
         Game[] games = new Game[count / 10];

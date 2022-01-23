@@ -141,7 +141,7 @@ public class Game {
         StringBuilder strbld = new StringBuilder();
         int i = 0;
         for(ArrayList<Combat> cmb : roundCombats) {
-            strbld.append("Round "+i+":\n");
+            strbld.append("Round ").append(i++).append(":\n");
             for(Combat combat : cmb) strbld.append(combat.generateCombatReport());
         }
         return strbld.toString();
