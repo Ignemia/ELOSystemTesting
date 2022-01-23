@@ -16,8 +16,17 @@ public class RoundStats {
 
     String mvp;
 
-    void setWinner() {
+    public void setPlayerDead(String playerId) {
+        survivingPLayers.remove(playerId);
+        deadPlayers.add(playerId);
+    }
 
+    public void addCombat(CombatStats cmb) {
+        combats.add(cmb);
+    }
+
+    public void setWinner(boolean team1Won) {
+        winner = team1Won ? 0 : 1;
     }
 
     String findMvp() {
@@ -25,18 +34,17 @@ public class RoundStats {
         for (String p : survivingPLayers) {
             float damage = 0F;
             for (CombatStats c : combats) {
-                if(c.playerWasInvolved(p)) damage +=  c.getTotalDamage(c.getIndex(p));
+                if (c.playerWasInvolved(p)) damage += c.getTotalDamage(c.getIndex(p));
             }
             damagesDealt.add(damage);
         }
         int highestDamageDealtIndex = -1;
         for (int i = 0; i < damagesDealt.size(); i++) {
-            if(highestDamageDealtIndex == -1)
-            {
+            if (highestDamageDealtIndex == -1) {
                 highestDamageDealtIndex = 0;
                 continue;
             }
-            if(damagesDealt.get(i) > damagesDealt.get(highestDamageDealtIndex)) highestDamageDealtIndex = i;
+            if (damagesDealt.get(i) > damagesDealt.get(highestDamageDealtIndex)) highestDamageDealtIndex = i;
         }
         return survivingPLayers.get(highestDamageDealtIndex);
     }
@@ -52,11 +60,12 @@ public class RoundStats {
         }
     }
 
-    void lock() throws RuntimeException{
+    RoundStats lock() throws RuntimeException {
         if (locked) throw new RuntimeException("Round is already locked!");
         endTiming();
-        mvp = findMvp();
+//        mvp = findMvp();
         setTotalDamageDealt();
+        return this;
     }
 
     public int getWinner() {

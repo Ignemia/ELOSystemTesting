@@ -15,11 +15,10 @@ public class Combat {
     ArrayList<Player> team1Players = new ArrayList<>();
     ArrayList<Player> team2Players = new ArrayList<>();
 
-    CombatStates status = CombatStates.IN_PROGRESS;
-
+    public CombatStates status = CombatStates.IN_PROGRESS;
     public CombatWinners winner = CombatWinners.IN_PROGRESS;
 
-    public static Combat EMPTY = (new Combat()).setState(CombatStates.EMPTY);
+    CombatStats stats = new CombatStats();
 
     private Combat setState(CombatStates state) {
         status = state;
@@ -30,12 +29,17 @@ public class Combat {
         if (toTeam1) team1Players.add(player);
         else team2Players.add(player);
 
+        stats.addPlayer(player.getId());
+
         events.add("%s joined team %s".formatted(player.getStatusString(), toTeam1 ? "team 1" : "team 2"));
 
         return this;
     }
 
-    public ArrayList<Player> runRound() {
+    public ArrayList<Player> runRound(RoundStats rStats) {
+        for (Player p: team1Players) if(p.status != PlayerStates.DEAD) stats.addRound(p.getId());
+        for (Player p: team2Players) if(p.status != PlayerStates.DEAD) stats.addRound(p.getId());
+
         for (Player p1 : team1Players) {
             for (Player p2 : team2Players) {
                 Random hits = new Random();
@@ -46,26 +50,34 @@ public class Combat {
                 float p1Damage = p1.getDamageMultiplier() * p1.getStats().getAttackDamage();
                 float p2Damage = p2.getDamageMultiplier() * p2.getStats().getAttackDamage();
 
+                stats.addToHitRate(stats.getIndex(p2.getId()), player2Hit);
+                stats.addToHitRate(stats.getIndex(p1.getId()), player1Hit);
+
                 if (p1.skill > p2.skill) {
                     hitOpponent(p2, p1, player2Hit, player1Hit, p2Damage, p1Damage);
                 } else {
                     hitOpponent(p1, p2, player1Hit, player2Hit, p1Damage, p2Damage);
                 }
+
+                if(p1.status == PlayerStates.DEAD) rStats.setPlayerDead(p1.getId());
+                if(p2.status == PlayerStates.DEAD) rStats.setPlayerDead(p2.getId());
             }
             if (team1Dead() || team2Dead()) return end();
         }
         if (team1Dead() || team2Dead()) return end();
-        return runRound();
+        return runRound(rStats);
     }
 
     private void hitOpponent(Player p1, Player p2, boolean player1Hit, boolean player2Hit, float p1Damage, float p2Damage) {
         if (player2Hit) {
             long dmg = p1.damage(p2Damage);
             events.add("%s took %s damage from %s".formatted(p1.getStatusString(), dmg, p2.getStatusString()));
+            stats.addDamage(stats.getIndex(p1.getId()), dmg);
         }
         if (player1Hit && p1.status != PlayerStates.DEAD) {
             long dmg = p2.damage(p1Damage);
             events.add("%s took %s damage from %s".formatted(p2.getStatusString(), dmg, p1.getStatusString()));
+            stats.addDamage(stats.getIndex(p2.getId()), dmg);
         }
     }
 
@@ -82,11 +94,15 @@ public class Combat {
 
         if(team1Dead()) {
             winner = CombatWinners.TEAM2;
-            return team2Players;
+            stats.setWinner(0);
         } else {
             winner = CombatWinners.TEAM1;
-            return team1Players;
+            stats.setWinner(1);
         }
+
+        System.out.println(stats);
+
+        return winner == CombatWinners.TEAM2 ? team2Players : team1Players;
     }
 
     private boolean team1Dead() {
@@ -102,8 +118,10 @@ public class Combat {
     public String generateCombatReport() {
         StringBuilder output = new StringBuilder();
         for (String ev : events) {
-            output.append(ev + "\n");
+            output.append(ev).append("\n");
         }
         return output + "\r\n";
     }
+
+    public static Combat EMPTY = (new Combat()).setState(CombatStates.EMPTY);
 }

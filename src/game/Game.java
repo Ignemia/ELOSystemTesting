@@ -7,23 +7,35 @@ import enums.PlayerStates;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
 
 public class Game {
-    Player[] allPlayers;
+    Player[] allPlayers = new Player[10];
     public Team team1 = new Team("t1");
     public Team team2 = new Team("t2");
 
-    Integer roundCount = 30;
+    Integer roundCount = 21;
 
     ArrayList<ArrayList<Combat>> roundCombats = new ArrayList<>();
+    GameStats stats = new GameStats();
 
-    private Game(Player[] players) {
-        if (players.length != 10) throw new InvalidParameterException(players.length < 10 ? "Too little players to create a game" : "Too many players to create a game");
-        allPlayers = players;
-        team1.assignPlayers(new Player[]{players[0], players[1], players[2], players[3], players[4]}).lockTeam();
-        team2.assignPlayers(new Player[]{players[5], players[6], players[7], players[8], players[9]}).lockTeam();
+    private Game(Player[] team1Players, Player[] team2Players) {
+        if (team1Players.length != 5)
+            throw new InvalidParameterException(team1Players.length < 5 ? "Too little players in Team 1 to create a game" : "Too many players in Team 1 to create a game");
+        if (team2Players.length != 5)
+            throw new InvalidParameterException(team2Players.length < 5 ? "Too little players in Team 2 to create a game" : "Too many players in Team 2 to create a game");
+        for(int i = 0; i < 10; i++) {
+            if( i < 5) addPlayer(team1Players[i], i);
+            else addPlayer(team2Players[i-5], i);
+        }
+        team1.assignPlayers(team1Players).lockTeam();
+        team2.assignPlayers(team2Players).lockTeam();
+    }
+
+    void addPlayer(Player p, int index) {
+        allPlayers[index] = p;
     }
 
     private static Player[] FilterPlayerBasedOnStates(Player[] players, PlayerStates state) {
@@ -58,14 +70,18 @@ public class Game {
         return pickRandomCombat(passingCombats);
     }
 
-    void nextRound() {
+    RoundStats nextRound() {
+        RoundStats rStats = new RoundStats();
         boolean team1HasLessPlayers = team1.deadPlayers.size() < team2.deadPlayers.size();
 
         ArrayList<Combat> combats = new ArrayList<>();
         for (Player p : GetNotDeadPlayers((team1HasLessPlayers ? team1 : team2).players)) combats.add((new Combat()).assignPlayer(p, team1HasLessPlayers));
         for (Player p : GetNotDeadPlayers((team1HasLessPlayers ? team2 : team1).players)) combats.get((new Random()).nextInt(0, combats.size())).assignPlayer(p, !team1HasLessPlayers);
 
-        for (Combat combat : combats) combat.runRound();
+        for (Combat combat : combats) {
+            combat.runRound(rStats);
+            rStats.addCombat(combat.stats.lock());
+        }
 
         Random seekersRandom = new Random();
         for (Player p : getSearchingPlayers()) {
@@ -82,22 +98,18 @@ public class Game {
             p.reset();
         }
 
-//        for(Combat com : combats) {
-//            System.out.println(com.generateCombatReport());
-//        }
-
+        return rStats.lock();
     }
 
     public Team play() {
         for (int i = 0; i < roundCount; i++) {
-            nextRound();
+            RoundStats rStats = nextRound();
         }
         return GetNotDeadPlayers(team1.players).length > 0 ? team1 : team2;
     }
 
-
     public static Game MakeGame(Player[] players) {
-        return new Game(players);
+        return new Game(Arrays.copyOfRange(players, 0, 5), Arrays.copyOfRange(players, 5, 10));
     }
 
     public Team getWinner() {

@@ -31,6 +31,7 @@ public class GameStats {
     public int getTeam2RoundWins() {
         return wonRounds[1];
     }
+
     int addRoundWin(int team) throws RuntimeException{
         if (locked) throw new RuntimeException("Game is already over!");
         return wonRounds[team]++;
