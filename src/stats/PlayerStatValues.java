@@ -1,4 +1,4 @@
-package actor.player;
+package stats;
 
 public class PlayerStatValues {
     private final long attackDamage;

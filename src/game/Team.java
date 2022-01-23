@@ -5,6 +5,7 @@ import enums.PlayerStates;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Team {
     int playerCount = 0;
@@ -25,13 +26,22 @@ public class Team {
     public boolean assignPlayer(Player p) throws ExceptionInInitializerError {
         if (locked) throw new ExceptionInInitializerError("Cannot assign players to a locked team!");
         players[playerCount++] = p;
+        p.lockPlayer();
         return true;
     }
 
-    public Team assignPlayers(Player[] players) {
+    public Team assignPlayers(ArrayList<Player> players) {
         if (locked) throw new ExceptionInInitializerError("Cannot assign players to a locked team!");
         for (Player p : players) assignPlayer(p);
         return this;
+    }
+
+    public float getAverageSkill() {
+        float skill = 0;
+        for ( Player p : players) {
+            skill += p.skill;
+        }
+        return skill / players.length;
     }
 
     public void lockTeam() {
@@ -46,5 +56,11 @@ public class Team {
     public boolean hasPlayer(Player p) {
         for (Player player : players) if (Objects.equals(p.getId(), player.getId())) return true;
         return false;
+    }
+
+    public static Team FromPlayerList(ArrayList<Player> players) {
+        Team t = new Team(UUID.randomUUID().toString());
+        t.assignPlayers(players);
+        return t;
     }
 }

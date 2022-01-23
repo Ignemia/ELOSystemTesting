@@ -2,6 +2,8 @@ package actor.player;
 
 import actor.Actor;
 import enums.PlayerStates;
+import stats.PlayerStatValues;
+import stats.PlayerStats;
 
 import java.util.Random;
 import java.util.UUID;
@@ -11,16 +13,20 @@ public class Player extends Actor {
     PlayerStats stats = new PlayerStats();
     public Float skill = 1000F;
     public PlayerStates status = PlayerStates.IN_GAME_SEARCH;
-
+    private boolean hasTeam = false;
 
     public Player(String in_name) {
         name = in_name;
         id = UUID.randomUUID().toString();
         Random r = new Random();
-        skill += r.nextFloat(-100F, 100F);
+        skill += r.nextFloat(-250F, 250F);
     }
 
-    public float getSearchingCoeficient() {
+    public boolean hasTeam() {
+        return hasTeam;
+    }
+
+    public float getSearchingCoefficient() {
         return 1F;
     }
 
@@ -59,5 +65,9 @@ public class Player extends Actor {
     public void reset() {
         setStatus(PlayerStates.SEEKING_COMBAT);
         stats.currentHp = stats.hpTotal;
+    }
+
+    public void lockPlayer() {
+        hasTeam = true;
     }
 }

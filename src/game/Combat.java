@@ -4,6 +4,8 @@ import actor.player.Player;
 import enums.CombatStates;
 import enums.CombatWinners;
 import enums.PlayerStates;
+import stats.CombatStats;
+import stats.RoundStats;
 
 import java.util.ArrayList;
 import java.util.Random;

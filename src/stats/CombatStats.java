@@ -1,4 +1,4 @@
-package game;
+package stats;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;

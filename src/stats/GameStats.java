@@ -1,9 +1,9 @@
-package game;
+package stats;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class GameStats {
+public class GameStats implements Stats {
     boolean locked = false;
     int[] wonRounds = new int[2];
 
